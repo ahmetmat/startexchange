@@ -1,46 +1,30 @@
 [algokit]
 min_version = "v2.0.0"
 
-[generate.smart-contract]
-description = "Generate a new smart contract for existing project"
-path = ".algokit/generators/create_contract"
-
-[generate.env-file]
-description = "Generate a new generic or Algorand network specific .env file"
-path = ".algokit/generators/create_env_file"
-
 [project]
-type = 'contract'
-name = 'startex-contracts'
-artifacts = 'smart_contracts/artifacts'
-
-[project.deploy]
-command = "poetry run python -m smart_contracts deploy"
-
-[project.deploy.testnet]
-environment_secrets = [
-  "DEPLOYER_MNEMONIC",
-]
-
-[project.deploy.mainnet]
-environment_secrets = [
-  "DEPLOYER_MNEMONIC",
-]
+type = "contract"
+name = "startex-contracts"
+artifacts = "smart_contracts/artifacts"
 
 [project.run]
-# Commands intented for use locally and in CI
-build = { commands = [
-  'poetry run python -m smart_contracts build',
-], description = 'Build all smart contracts in the project' }
-lint = { commands = [
-], description = 'Perform linting' }
+build = { commands = ["poetry run python -m smart_contracts build"], description = "Build all smart contracts in the project" }
 audit-teal = { commands = [
-  # 🚨 IMPORTANT 🚨: For strict TEAL validation, remove --exclude statements. The default starter contract is not for production. Ensure thorough testing and adherence to best practices in smart contract development. This is not a replacement for a professional audit.
-  'algokit task analyze smart_contracts/artifacts --recursive --force --exclude rekey-to --exclude is-updatable --exclude missing-fee-check --exclude is-deletable --exclude can-close-asset --exclude can-close-account --exclude unprotected-deletable --exclude unprotected-updatable',
-], description = 'Audit TEAL files' }
+  "algokit task analyze smart_contracts/artifacts --recursive --force --exclude rekey-to --exclude is-updatable --exclude missing-fee-check --exclude is-deletable --exclude can-close-asset --exclude can-close-account --exclude unprotected-deletable --exclude unprotected-updatable"
+], description = "Audit TEAL files" }
 
-# Commands intented for CI only, prefixed with `ci-` by convention
-ci-teal-diff = { commands = [
-  'git add -N ./smart_contracts/artifacts',
-  'git diff --exit-code --minimal ./smart_contracts/artifacts',
-], description = 'Check TEAL files for differences' }
+[project.deploy]
+# Genel (fallback) komut – herhangi bir ortam adı verilse de kullanılabilir
+command = "poetry run python -m smart_contracts deploy"
+
+[project.deploy.localnet]
+# İstersen burada ayrı command yazabilirsin; yazmazsan yukarıdaki genel command kullanılır
+environment_secrets = []
+
+[project.deploy.testnet]
+# Hata almamak için TESTNET için de açıkça command veriyoruz
+command = "poetry run python -m smart_contracts deploy"
+environment_secrets = ["DEPLOYER_MNEMONIC", "ALGOD_SERVER", "ALGOD_PORT", "ALGOD_TOKEN"]
+
+[project.deploy.mainnet]
+command = "poetry run python -m smart_contracts deploy"
+environment_secrets = ["DEPLOYER_MNEMONIC", "ALGOD_SERVER", "ALGOD_PORT", "ALGOD_TOKEN"]

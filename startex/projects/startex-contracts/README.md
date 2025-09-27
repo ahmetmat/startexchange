@@ -73,6 +73,19 @@ By default the template creates a single `HelloWorld` contract under hello_world
 
 > Please note, above is just a suggested convention tailored for the base configuration and structure of this template. The default code supplied by the template in `config.py` and `index.ts` (if using ts clients) files are tailored for the suggested convention. You are free to modify the structure and naming conventions as you see fit.
 
+### Startup tokenization contract
+
+The `smart_contracts/startup_tokenization` folder contains a Router-based PyTeal application that backs the founder tokenization workflow. It stores per-startup metadata in boxes, validates registry/tokenization fees, links ASA identifiers, and tracks liquidity/pricing controls.
+
+To work with it locally:
+
+1. Build the contract artifacts: `algokit project run build -- startup_tokenization`
+2. Deploy to your chosen network: `algokit project deploy localnet -- startup_tokenization`
+3. Link generated TypeScript clients from the frontend with `npm run generate:app-clients`
+4. Surface the deployed app id to the frontend via `VITE_STARTUP_APP_ID`
+
+The frontend form will then orchestrate fee payments + method calls using AlgoKit utilities, letting founders register and tokenize straight from their connected wallet.
+
 ### Generate '.env' files
 
 By default the template instance does not contain any env files. Using [`algokit project deploy`](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/features/project/deploy.md) against `localnet` | `testnet` | `mainnet` will use default values for `algod` and `indexer` unless overwritten via `.env` or `.env.{target_network}`. 
@@ -98,4 +111,3 @@ This project makes use of Algorand Python to build Algorand smart contracts. The
 - [AlgoKit Utils](https://github.com/algorandfoundation/algokit-utils-py) - A set of core Algorand utilities that make it easier to build solutions on Algorand.
 - [Poetry](https://python-poetry.org/): Python packaging and dependency management.
 It has also been configured to have a productive dev experience out of the box in [VS Code](https://code.visualstudio.com/), see the [.vscode](./.vscode) folder.
-

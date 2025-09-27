@@ -1,74 +1,56 @@
-// src/components/Home.tsx
 import { useWallet } from '@txnlab/use-wallet-react'
 import React, { useState } from 'react'
+
 import ConnectWallet from './components/ConnectWallet'
 import Transact from './components/Transact'
-import AppCalls from './components/AppCalls'
+import { StartupTokenizationForm } from './components/tokenization/StartupTokenizationForm'
 
-interface HomeProps {}
-
-const Home: React.FC<HomeProps> = () => {
-  const [openWalletModal, setOpenWalletModal] = useState<boolean>(false)
-  const [openDemoModal, setOpenDemoModal] = useState<boolean>(false)
-  const [appCallsDemoModal, setAppCallsDemoModal] = useState<boolean>(false)
+const Home: React.FC = () => {
+  const [openWalletModal, setOpenWalletModal] = useState(false)
+  const [openDemoModal, setOpenDemoModal] = useState(false)
   const { activeAddress } = useWallet()
 
-  const toggleWalletModal = () => {
-    setOpenWalletModal(!openWalletModal)
-  }
-
-  const toggleDemoModal = () => {
-    setOpenDemoModal(!openDemoModal)
-  }
-
-  const toggleAppCallsModal = () => {
-    setAppCallsDemoModal(!appCallsDemoModal)
-  }
+  const toggleWalletModal = () => setOpenWalletModal((prev) => !prev)
+  const toggleDemoModal = () => setOpenDemoModal((prev) => !prev)
 
   return (
-    <div className="hero min-h-screen bg-teal-400">
-      <div className="hero-content text-center rounded-lg p-6 max-w-md bg-white mx-auto">
-        <div className="max-w-md">
-          <h1 className="text-4xl">
-            Welcome to <div className="font-bold">AlgoKit 🙂</div>
-          </h1>
-          <p className="py-6">
-            This starter has been generated using official AlgoKit React template. Refer to the resource below for next steps.
-          </p>
-
-          <div className="grid">
-            <a
-              data-test-id="getting-started"
-              className="btn btn-primary m-2"
-              target="_blank"
-              href="https://github.com/algorandfoundation/algokit-cli"
-            >
-              Getting started
-            </a>
-
-            <div className="divider" />
-            <button data-test-id="connect-wallet" className="btn m-2" onClick={toggleWalletModal}>
-              Wallet Connection
-            </button>
-
-            {activeAddress && (
-              <button data-test-id="transactions-demo" className="btn m-2" onClick={toggleDemoModal}>
-                Transactions Demo
+    <div className="min-h-screen bg-slate-100">
+      <section className="hero bg-gradient-to-br from-teal-500 via-sky-500 to-cyan-500 text-white">
+        <div className="hero-content text-center p-6 md:p-12">
+          <div className="max-w-2xl bg-white/90 text-slate-900 backdrop-blur rounded-2xl shadow-lg p-8 space-y-6">
+            <h1 className="text-4xl font-semibold">
+              Tokenize founder equity with <span className="font-bold text-teal-600">AlgoKit</span>
+            </h1>
+            <p className="text-base text-slate-600">
+              Capture startup metadata, stream liquidity into Algorand localnet, and mint ASA-backed ownership the moment you connect your wallet.
+            </p>
+            <div className="grid gap-3 md:grid-cols-3">
+              <a
+                data-test-id="getting-started"
+                className="btn btn-primary"
+                target="_blank"
+                rel="noreferrer"
+                href="https://github.com/algorandfoundation/algokit-cli"
+              >
+                AlgoKit docs
+              </a>
+              <button data-test-id="connect-wallet" className="btn" onClick={toggleWalletModal}>
+                Wallet connection
               </button>
-            )}
-
-            {activeAddress && (
-              <button data-test-id="appcalls-demo" className="btn m-2" onClick={toggleAppCallsModal}>
-                Contract Interactions Demo
+              <button className="btn btn-outline" onClick={toggleDemoModal} disabled={!activeAddress}>
+                Transactions demo
               </button>
-            )}
+            </div>
           </div>
-
-          <ConnectWallet openModal={openWalletModal} closeModal={toggleWalletModal} />
-          <Transact openModal={openDemoModal} setModalState={setOpenDemoModal} />
-          <AppCalls openModal={appCallsDemoModal} setModalState={setAppCallsDemoModal} />
         </div>
-      </div>
+      </section>
+
+      <main className="max-w-5xl mx-auto px-4 py-10 space-y-8">
+        <StartupTokenizationForm />
+      </main>
+
+      <ConnectWallet openModal={openWalletModal} closeModal={toggleWalletModal} />
+      <Transact openModal={openDemoModal} setModalState={setOpenDemoModal} />
     </div>
   )
 }

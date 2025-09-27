@@ -49,6 +49,19 @@ This project supports both standalone and monorepo setups through AlgoKit worksp
 
 > Please note, by default frontend is pre configured to run against Algorand LocalNet. If you want to run against TestNet or MainNet, comment out the current environment variable and uncomment the relevant one in [`.env`](.env) file that is created after running bootstrap command and based on [`.env.template`](.env.template).
 
+## Startup tokenization workflow
+
+This template now ships with an end-to-end flow that lets founders register their startup metadata, deposit liquidity, and link an ASA that represents their equity. To try it out:
+
+1. Build the `startup_tokenization` contract: `algokit project run build -- startup_tokenization` (or run the full build). Deploy it with `algokit project deploy localnet -- startup_tokenization` and note the application ID.
+2. Configure your frontend environment. Copy `.env.template` to `.env.localnet` (or `.env.testnet`) and update:
+   - `VITE_ALGOD_NETWORK=localnet` or `testnet`
+   - the corresponding Algod/Indexer endpoints
+   - `VITE_STARTUP_APP_ID=<deployed id>`
+3. Start the UI with `npm run dev`, connect a wallet, and use the **Tokenize Your Startup** card to submit registration data, fund liquidity, and adjust pricing.
+
+The interactions are wired through `src/lib/algorand/client.ts` (centralized Algokit client + network helpers) and `src/lib/algorand/startupTokenization.ts` (grouped ABI calls built with the latest `@algorandfoundation/algokit-utils`). `StartupTokenizationForm` composes those helpers with the connected wallet, so transactions work on LocalNet out of the box and can be switched to TestNet by flipping `VITE_ALGOD_NETWORK` and endpoints.
+
 # Algorand Wallet integrations
 
 The template comes with [`use-wallet`](https://github.com/txnlab/use-wallet) integration, which provides a React hook for connecting to an Algorand wallet providers. The following wallet providers are included by default:
