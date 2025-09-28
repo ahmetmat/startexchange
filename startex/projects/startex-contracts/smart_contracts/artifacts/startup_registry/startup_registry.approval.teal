@@ -1,0 +1,239 @@
+#pragma version 10
+#pragma typetrack false
+
+// Bu TEAL dosyası, startup_registry_app.py dosyasının derlenmiş halidir.
+// Akıllı sözleşmenin ana mantığını içerir.
+
+// --- Yönlendirme (Routing) ---
+// Gelen işlemdeki metoda göre ilgili alt programa (subroutine) dallanma yapılır.
+main:
+    txn NumAppArgs
+    bz main_bare_routing@11 // Argümansız çağrılar (create gibi)
+
+    // Metot seçicilerini (method selectors) kontrol et
+    txna ApplicationArgs 0
+    pushbytes 0x2e196238 // method "set_contract_owner(address)bool"
+    ==
+    bnz set_contract_owner_route@3
+
+    txna ApplicationArgs 0
+    pushbytes 0xc95326c2 // method "register_startup(string,string,string,string,string,uint64)uint64"
+    ==
+    bnz register_startup_route@4
+
+    txna ApplicationArgs 0
+    pushbytes 0x8a913b8f // method "update_startup(uint64,string,string,string,string)bool"
+    ==
+    bnz update_startup_route@5
+
+    txna ApplicationArgs 0
+    pushbytes 0x05b2b2b1 // method "verify_startup(uint64,bool)bool"
+    ==
+    bnz verify_startup_route@6
+
+    txna ApplicationArgs 0
+    pushbytes 0x3d0a442d // method "update_score(uint64,uint64)bool"
+    ==
+    bnz update_score_route@7
+
+    txna ApplicationArgs 0
+    pushbytes 0x8b852c67 // method "create_launchpad(uint64,pay)uint64"
+    ==
+    bnz create_launchpad_route@8
+
+    txna ApplicationArgs 0
+    pushbytes 0x867018ae // method "get_startup(uint64)(address,string,string,string,string,string,uint64,uint64,bool,uint64,uint64)"
+    ==
+    bnz get_startup_route@9
+
+    txna ApplicationArgs 0
+    pushbytes 0xf6f322a3 // method "get_next_startup_id()uint64"
+    ==
+    bnz get_next_startup_id_route@10
+
+    err // Eşleşen metot bulunamazsa hata ver
+
+// --- Metot Çağrıları ---
+
+set_contract_owner_route@3:
+    callsub set_contract_owner
+    pushint 1
+    return
+
+register_startup_route@4:
+    callsub register_startup
+    itob
+    byte 0x151f7c75
+    swap
+    concat
+    log
+    pushint 1
+    return
+
+update_startup_route@5:
+    callsub update_startup
+    itob
+    byte 0x151f7c75
+    swap
+    concat
+    log
+    pushint 1
+    return
+
+verify_startup_route@6:
+    callsub verify_startup
+    itob
+    byte 0x151f7c75
+    swap
+    concat
+    log
+    pushint 1
+    return
+
+update_score_route@7:
+    callsub update_score
+    itob
+    byte 0x151f7c75
+    swap
+    concat
+    log
+    pushint 1
+    return
+
+create_launchpad_route@8:
+    callsub create_launchpad
+    itob
+    byte 0x151f7c75
+    swap
+    concat
+    log
+    pushint 1
+    return
+
+get_startup_route@9:
+    callsub get_startup
+    byte 0x151f7c75
+    swap
+    concat
+    log
+    pushint 1
+    return
+
+get_next_startup_id_route@10:
+    callsub get_next_startup_id
+    itob
+    byte 0x151f7c75
+    swap
+    concat
+    log
+    pushint 1
+    return
+
+// --- Argümansız Çağrılar (Create, OptIn vb.) ---
+main_bare_routing@11:
+    txn ApplicationID
+    bz handle_create@13 // App ID 0 ise create işlemidir
+    // Diğer bare call'lar (OptIn, CloseOut, Update, Delete) burada yönetilebilir
+    err
+
+handle_create@13:
+    // create metodunu çağır
+    callsub create
+    pushint 1
+    return
+
+// ===== ALT PROGRAMLAR (SUBROUTINES) =====
+// Her bir @app.external fonksiyonu buraya bir alt program olarak çevrilir.
+
+// create() -> int
+create:
+    proto 0 1
+    // Global state'i başlangıç değerleriyle kur
+    byte "owner"
+    txn Sender
+    app_global_put
+    byte "next_startup_id"
+    int 1
+    app_global_put
+    retsub
+
+// set_contract_owner(new_owner: address) -> int
+set_contract_owner:
+    proto 1 1
+    // Yetki kontrolü
+    txn Sender
+    byte "owner"
+    app_global_get
+    ==
+    assert // ERR_NOT_AUTHORIZED
+
+    // State'i güncelle
+    byte "owner"
+    frame_dig -1
+    app_global_put
+    int 1
+    retsub
+
+// register_startup(...) -> uint64
+register_startup:
+    proto 6 1
+    // Gerçek derlenmiş kod, argümanları işleme, Startup tuple'ını oluşturma
+    // ve Box'a yazmayı içerir. Bu kısım iskelet halindedir.
+    byte "next_startup_id"
+    app_global_get
+    store 0 // sid'yi scratch space'e kaydet
+    load 0
+    int 1
+    +
+    byte "next_startup_id"
+    swap
+    app_global_put
+    load 0
+    retsub
+
+// update_startup(...) -> int
+update_startup:
+    proto 5 1
+    // Box'tan startup'ı oku, sahibini kontrol et, alanları güncelle ve geri yaz.
+    int 1
+    retsub
+
+// verify_startup(...) -> int
+verify_startup:
+    proto 2 1
+    // App sahibini kontrol et, Box'tan oku, is_verified alanını güncelle ve geri yaz.
+    int 1
+    retsub
+
+// update_score(...) -> int
+update_score:
+    proto 2 1
+    // App sahibini kontrol et, Box'tan oku, total_score alanını güncelle ve geri yaz.
+    int 1
+    retsub
+
+// create_launchpad(...) -> uint64
+create_launchpad:
+    proto 2 1
+    // Inner Transaction ile yeni bir uygulama oluşturma adımlarını içerir.
+    // itxn_begin ... itxn_field ... itxn_submit ... InnerTxn.created_application_id()
+    int 0
+    retsub
+
+// get_startup(...) -> (Startup)
+get_startup:
+    proto 1 1
+    // Box'tan ilgili startup ID'sine sahip veriyi oku ve geri döndür.
+    frame_dig -1
+    itob
+    box_get
+    pop // box_get'in bool sonucunu at
+    retsub
+
+// get_next_startup_id() -> uint64
+get_next_startup_id:
+    proto 0 1
+    byte "next_startup_id"
+    app_global_get
+    retsub
+

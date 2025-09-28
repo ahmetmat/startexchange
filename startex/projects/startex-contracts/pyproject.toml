@@ -14,6 +14,8 @@ algorand-python = "^2.0.0"
 algorand-python-testing = "~0"
 beaker = "1.1.1"
 pyteal = "0.24.1"
+setuptools = "^80.9.0"
+py-algorand-sdk = "^2.11.0"
 
 [tool.poetry.group.dev.dependencies]
 algokit-client-generator = "^2.1.0"

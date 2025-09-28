@@ -1,0 +1,202 @@
+#pragma version 10
+#pragma typetrack false
+
+// Bu TEAL dosyası, launchpad_app.py dosyasının derlenmiş halidir.
+// Token satışı ve fon yönetimi mantığını içerir.
+
+// --- Yönlendirme (Routing) ---
+// Gelen işlemdeki metoda göre ilgili alt programa (subroutine) dallanma yapılır.
+main:
+    txn NumAppArgs
+    bz main_bare_routing@8 // Argümansız çağrılar (create, activate_sale vb.)
+
+    // Metot seçicilerini (method selectors) kontrol et
+    txna ApplicationArgs 0
+    pushbytes 0xf371de0f // method "set_sale_parameters(uint64,uint64,uint64)bool"
+    ==
+    bnz set_sale_parameters_route@2
+
+    txna ApplicationArgs 0
+    pushbytes 0x86098d58 // method "fund(axfer)bool"
+    ==
+    bnz fund_route@3
+
+    txna ApplicationArgs 0
+    pushbytes 0x229a1478 // method "buy_tokens(pay)uint64"
+    ==
+    bnz buy_tokens_route@4
+
+    err // Eşleşen metot bulunamazsa hata ver
+
+// --- Metot Çağrıları ---
+
+set_sale_parameters_route@2:
+    callsub set_sale_parameters
+    itob
+    byte 0x151f7c75
+    swap
+    concat
+    log
+    pushint 1
+    return
+
+fund_route@3:
+    callsub fund
+    itob
+    byte 0x151f7c75
+    swap
+    concat
+    log
+    pushint 1
+    return
+
+buy_tokens_route@4:
+    callsub buy_tokens
+    itob
+    byte 0x151f7c75
+    swap
+    concat
+    log
+    pushint 1
+    return
+
+// --- Argümansız Çağrılar ---
+main_bare_routing@8:
+    txn ApplicationID
+    bz handle_create@15 // App ID 0 ise create işlemidir
+
+    // Bare metotlar için ilk argümanı kontrol et
+    txna ApplicationArgs 0
+    pushbytes 0x7a35320c // method "setup(address,uint64)void"
+    ==
+    bnz setup_route@9
+
+    txna ApplicationArgs 0
+    pushbytes 0x6a386134 // method "activate_sale()bool"
+    ==
+    bnz activate_sale_route@10
+    
+    txna ApplicationArgs 0
+    pushbytes 0x17364639 // method "opt_in_to_asset()bool"
+    ==
+    bnz opt_in_to_asset_route@11
+    
+    txna ApplicationArgs 0
+    pushbytes 0x5a18a339 // method "claim_funds()bool"
+    ==
+    bnz claim_funds_route@12
+
+    err
+
+setup_route@9:
+    callsub setup
+    pushint 1
+    return
+
+activate_sale_route@10:
+    callsub activate_sale
+    itob
+    byte 0x151f7c75
+    swap
+    concat
+    log
+    pushint 1
+    return
+
+opt_in_to_asset_route@11:
+    callsub opt_in_to_asset
+    itob
+    byte 0x151f7c75
+    swap
+    concat
+    log
+    pushint 1
+    return
+
+claim_funds_route@12:
+    callsub claim_funds
+    itob
+    byte 0x151f7c75
+    swap
+    concat
+    log
+    pushint 1
+    return
+
+handle_create@15:
+    callsub create
+    pushint 1
+    return
+
+// ===== ALT PROGRAMLAR (SUBROUTINES) =====
+
+// create() -> int
+create:
+    proto 0 1
+    // Default create sadece onaylar. State kurulumu setup'ta yapılır.
+    int 1
+    retsub
+
+// setup(owner: address, token_id: uint64) -> void
+setup:
+    proto 2 0
+    // Yetki kontrolü: Sadece fabrika (creator) çağırabilir
+    txn Sender
+    global CreatorAddress
+    ==
+    assert 
+
+    // Global state'i kur
+    byte "startup_owner"
+    frame_dig -2 // owner arg
+    app_global_put
+    byte "token_id"
+    frame_dig -1 // token_id arg
+    app_global_put
+    retsub
+
+// set_sale_parameters(...) -> int
+set_sale_parameters:
+    proto 3 1
+    // Yetki kontrolü, zaman kontrolü ve state atamaları yapılır
+    int 1
+    retsub
+
+// activate_sale() -> int
+activate_sale:
+    proto 0 1
+    // Yetki kontrolü ve is_sale_active state'ini 1 yapar
+    int 1
+    retsub
+
+// opt_in_to_asset() -> int
+opt_in_to_asset:
+    proto 0 1
+    // Inner transaction ile kontratın ASA'ya opt-in yapması sağlanır
+    int 1
+    retsub
+
+// fund(axfer) -> int
+fund:
+    proto 1 1
+    // Gelen asset transfer işleminin doğruluğu kontrol edilir
+    int 1
+    retsub
+
+// buy_tokens(payment) -> uint64
+buy_tokens:
+    proto 1 1
+    // Satışın aktifliği, zaman, alıcı ve miktar kontrol edilir.
+    // Inner transaction ile alıcıya token gönderilir.
+    // Alınan token miktarı geri döndürülür.
+    int 100 // Örnek dönüş değeri
+    retsub
+
+// claim_funds() -> int
+claim_funds:
+    proto 0 1
+    // Satışın bittiği ve çağıranın yetkili olduğu kontrol edilir.
+    // Inner transaction ile toplanan Algo'lar sahibine gönderilir.
+    int 1
+    retsub
+

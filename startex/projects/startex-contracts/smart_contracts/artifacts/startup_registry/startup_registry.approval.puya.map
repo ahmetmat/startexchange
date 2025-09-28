@@ -1,0 +1,155 @@
+{
+  "version": 3,
+  "sources": [
+    "../../startup_registry/startup_registry_app.py"
+  ],
+  "mappings": ";;AAIA;;AAAA;;;AAAA;;;AAAA;;;;;;AAAA;;;AAAA;;;;AAAA;;;AACK;;AAAA;AAAA;AAAA;;AAAA;AADL;;;AAAA;;;AACK;;;AAAA;AAAA;AAAA;AAAA;;;AAAA;AAAA;AAAA;;;;;;AAAA;AAAA;AAAA;AAAA;;;AADL;;AAAA;;;;;;;;;;AACA;;;AAEe;;;;;;;;;AAAA;;AAAA;AAAP",
+  "op_pc_offset": 0,
+  "pc_events": {
+    "1": {
+      "subroutine": "main",
+      "op": "txn NumAppArgs"
+    },
+    "3": {
+      "op": "bz main_bare_routing@11"
+    },
+    "6": {
+      "op": "txna ApplicationArgs 0"
+    },
+    "9": {
+      "op": "pushbytes 0x2e196238 // method \"set_contract_owner(address)bool\""
+    },
+    "15": {
+      "op": "=="
+    },
+    "16": {
+      "op": "bnz set_contract_owner_route@3"
+    },
+    "19": {
+      "op": "txna ApplicationArgs 0"
+    },
+    "22": {
+      "op": "pushbytes 0xc95326c2 // method \"register_startup(...)\""
+    },
+    "28": {
+      "op": "=="
+    },
+    "29": {
+      "op": "bnz register_startup_route@4"
+    },
+    "85": {
+      "block": "set_contract_owner_route@3",
+      "op": "callsub set_contract_owner"
+    },
+    "88": {
+      "op": "pushint 1"
+    },
+    "90": {
+      "op": "return"
+    },
+    "91": {
+      "block": "register_startup_route@4",
+      "op": "callsub register_startup"
+    },
+    "94": {
+      "op": "itob"
+    },
+    "95": {
+      "op": "byte 0x151f7c75"
+    },
+    "101": {
+      "op": "swap"
+    },
+    "102": {
+      "op": "concat"
+    },
+    "103": {
+      "op": "log"
+    },
+    "104": {
+      "op": "pushint 1"
+    },
+    "106": {
+      "op": "return"
+    },
+    "160": {
+      "block": "main_bare_routing@11",
+      "op": "txn ApplicationID"
+    },
+    "162": {
+      "op": "bz handle_create@13"
+    },
+    "165": {
+      "op": "err"
+    },
+    "166": {
+      "block": "handle_create@13",
+      "op": "callsub create"
+    },
+    "169": {
+      "op": "pushint 1"
+    },
+    "171": {
+      "op": "return"
+    },
+    "172": {
+      "subroutine": "create",
+      "op": "proto 0 1"
+    },
+    "175": {
+      "op": "byte \"owner\""
+    },
+    "182": {
+      "op": "txn Sender"
+    },
+    "184": {
+      "op": "app_global_put"
+    },
+    "185": {
+      "op": "byte \"next_startup_id\""
+    },
+    "202": {
+      "op": "int 1"
+    },
+    "203": {
+      "op": "app_global_put"
+    },
+    "204": {
+      "op": "retsub"
+    },
+    "205": {
+      "subroutine": "set_contract_owner",
+      "op": "proto 1 1"
+    },
+    "208": {
+      "op": "txn Sender"
+    },
+    "210": {
+      "op": "byte \"owner\""
+    },
+    "217": {
+      "op": "app_global_get"
+    },
+    "218": {
+      "op": "=="
+    },
+    "219": {
+      "op": "assert // ERR_NOT_AUTHORIZED"
+    },
+    "220": {
+      "op": "byte \"owner\""
+    },
+    "227": {
+      "op": "frame_dig -1"
+    },
+    "229": {
+      "op": "app_global_put"
+    },
+    "230": {
+      "op": "int 1"
+    },
+    "231": {
+      "op": "retsub"
+    }
+  }
+}

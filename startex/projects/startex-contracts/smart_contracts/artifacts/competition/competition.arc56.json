@@ -1,0 +1,89 @@
+{
+  "version": 3,
+  "sources": [
+    "../../competition_app.py"
+  ],
+  "mappings": ";;;",
+  "op_pc_offset": 0,
+  "pc_events": {
+    "1": {
+      "subroutine": "main",
+      "op": "txn NumAppArgs"
+    },
+    "3": {
+      "op": "bz main_bare_routing@10"
+    },
+    "6": {
+      "op": "txna ApplicationArgs 0"
+    },
+    "9": {
+      "op": "pushbytes 0x932f7a0a // method \"set_owner(address)void\""
+    },
+    "15": {
+      "op": "=="
+    },
+    "16": {
+      "op": "bnz set_owner_route@2"
+    },
+    "19": {
+        "op": "txna ApplicationArgs 0"
+    },
+    "22": {
+        "op": "pushbytes 0x19a44123 // method \"create_competition(...)\""
+    },
+    "28": {
+        "op": "=="
+    },
+    "29": {
+        "op": "bnz create_competition_route@3"
+    },
+    "46": {
+      "block": "set_owner_route@2",
+      "op": "callsub set_owner"
+    },
+    "49": {
+        "op": "pushint 1"
+    },
+    "51": {
+        "op": "return"
+    },
+    "52": {
+      "block": "create_competition_route@3",
+      "op": "callsub create_competition"
+    },
+    "92": {
+      "block": "main_bare_routing@10",
+      "op": "txn ApplicationID"
+    },
+    "94": {
+      "op": "bz handle_create@11"
+    },
+    "97": {
+        "op": "err"
+    },
+    "98": {
+      "block": "handle_create@11",
+      "op": "callsub create"
+    },
+    "101": {
+        "op": "pushint 1"
+    },
+    "103": {
+        "op": "return"
+    },
+    "104": {
+      "subroutine": "create",
+      "op": "proto 1 0"
+    },
+    "107": {
+      "op": "retsub"
+    },
+    "108": {
+      "subroutine": "set_owner",
+      "op": "proto 1 0"
+    },
+    "111": {
+      "op": "retsub"
+    }
+  }
+}

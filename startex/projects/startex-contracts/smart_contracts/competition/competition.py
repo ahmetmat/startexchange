@@ -1,5 +1,7 @@
-# smart_contracts/competition_app.py
-from beaker import *
+from beaker.application import Application
+from beaker.state import GlobalStateValue
+from beaker.lib.storage import BoxMapping
+from beaker.decorators import Authorize            # <-- DOĞRU YER
 from pyteal import *
 
 # Registry App'in arayüzünü tanımlıyoruz ki onu çağırabilelim.
@@ -24,27 +26,27 @@ ERR_INVALID_CALLER = Bytes("ERR_INVALID_CALLER")
 # Veri Yapıları
 # --------------------------------------------
 class Competition(abi.NamedTuple):
-    name: abi.String
-    description: abi.String
-    start_time: abi.Uint64 # Artık block yerine timestamp daha esnek
-    end_time: abi.Uint64
-    status: abi.Uint64
-    total_prize_pool: abi.Uint64
-    max_participants: abi.Uint64
-    entry_fee: abi.Uint64
+    name: abi.Field[abi.String]
+    description: abi.Field[abi.String]
+    start_time: abi.Field[abi.Uint64]
+    end_time: abi.Field[abi.Uint64]
+    status: abi.Field[abi.Uint64]
+    total_prize_pool: abi.Field[abi.Uint64]
+    max_participants: abi.Field[abi.Uint64]
+    entry_fee: abi.Field[abi.Uint64]
 
 class Participant(abi.NamedTuple):
-    startup_owner: abi.Address
-    joined_at: abi.Uint64
-    score: abi.Uint64 # Sadece tek bir skor alanı yeterli
-    rank: abi.Uint64
-    reward_claimed: abi.Bool
+    startup_owner: abi.Field[abi.Address]
+    joined_at: abi.Field[abi.Uint64]
+    score: abi.Field[abi.Uint64]
+    rank: abi.Field[abi.Uint64]
+    reward_claimed: abi.Field[abi.Bool]
 
 class Results(abi.NamedTuple):
-    first_place_sid: abi.Uint64
-    second_place_sid: abi.Uint64
-    third_place_sid: abi.Uint64
-    rewards_distributed: abi.Bool
+    first_place_sid: abi.Field[abi.Uint64]
+    second_place_sid: abi.Field[abi.Uint64]
+    third_place_sid: abi.Field[abi.Uint64]
+    rewards_distributed: abi.Field[abi.Bool]
 
 # --------------------------------------------
 # Uygulama Durumu
@@ -281,12 +283,7 @@ def claim_reward(competition_id: abi.Uint64, startup_id: abi.Uint64, *, output: 
 # --------------------------------------------
 # Read-only Methods
 # --------------------------------------------
-@app.read_only
-def get_competition(competition_id: abi.Uint64, *, output: Competition):
-    return output.decode(competitions[competition_id.get()].get())
-
-@app.read_only
-def get_participant(competition_id: abi.Uint64, startup_id: abi.Uint64, *, output: Participant):
-    key = abi.Tuple2[abi.Uint64, abi.Uint64]()
-    key.set(competition_id, startup_id)
-    return output.decode(participants[key].get())
+@app.external(read_only=True)
+def get_competition(competition_id: abi.Uint64, *, output: Competition): ...
+@app.external(read_only=True)
+def get_participant(competition_id: abi.Uint64, startup_id: abi.Uint64, *, output: Participant): ...

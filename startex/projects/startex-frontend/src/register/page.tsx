@@ -3,6 +3,8 @@
 
     import { useState } from 'react'
     import "tailwindcss";
+    import { upsertStartupProfileWithMetrics } from '../lib/firebase/firestore'
+
     import {
     Rocket, Github, Twitter, Globe, ArrowRight, CheckCircle,
     AlertCircle, Sparkles, Zap, Coins, Wallet
@@ -241,8 +243,8 @@
             </div>
 
             <button
-            onClick={() => router.push('/')}
-            className="px-6 py-3 rounded-full font-semibold bg-white border-2 border-orange-300 hover:border-orange-400 text-orange-700 transition-all"
+                onClick={() => window.location.href = '/'}
+                className="px-6 py-3 rounded-full font-semibold bg-white border-2 border-orange-300 hover:border-orange-400 text-orange-700 transition-all"
             >
             Go Back
             </button>

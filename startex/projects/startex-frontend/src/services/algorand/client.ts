@@ -76,7 +76,36 @@ const getConfig = (): AlgorandConfig => {
   
   return configs[network];
 };
-
+export async function sendAlgo({ to, amountAlgo, note }: { 
+  to: string, 
+  amountAlgo: number, 
+  note?: string 
+}): Promise<string> {
+  const service = AlgorandService.getInstance()
+  const algodClient = service.getAlgodClient()
+  const currentAddress = service.getCurrentAddress()
+  
+  if (!currentAddress) {
+    throw new Error('Wallet not connected')
+  }
+  
+  const suggestedParams = await algodClient.getTransactionParams().do()
+  const amountMicroAlgos = Math.floor(amountAlgo * 1_000_000)
+  
+  const txn = algosdk.makePaymentTxnWithSuggestedParamsFromObject({
+    from: currentAddress,
+    to,
+    amount: amountMicroAlgos,
+    note: note ? new Uint8Array(Buffer.from(note)) : undefined,
+    suggestedParams
+  })
+  
+  const signedTxn = await service.signTransaction(txn)
+  const { txId } = await algodClient.sendRawTransaction(signedTxn).do()
+  await algosdk.waitForConfirmation(algodClient, txId, 4)
+  
+  return txId
+}
 // Algorand Client Service
 export class AlgorandService {
   private static instance: AlgorandService;

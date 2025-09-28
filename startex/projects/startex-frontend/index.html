@@ -1,12 +1,1380 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AlgoKit React Template</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StartEx - Revolutionary Startup Tokenization Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Algorand Color Palette */
+            --algo-primary: #000000;
+            --algo-secondary: #FFFFFF;
+            --algo-accent: #00D4FF;
+            --algo-blue: #0066CC;
+            --algo-light-blue: #E6F4FF;
+            --algo-dark: #1A1A1A;
+            --algo-gray: #6B7280;
+            --algo-light-gray: #F3F4F6;
+            
+            /* Additional modern colors */
+            --gradient-start: #000000;
+            --gradient-end: #00D4FF;
+            --success: #10B981;
+            --warning: #F59E0B;
+            --error: #EF4444;
+            
+            /* Typography */
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-weight-light: 300;
+            --font-weight-normal: 400;
+            --font-weight-medium: 500;
+            --font-weight-semibold: 600;
+            --font-weight-bold: 700;
+            --font-weight-black: 900;
+            
+            /* Spacing */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+            --space-3xl: 4rem;
+            
+            /* Border radius */
+            --radius-sm: 0.375rem;
+            --radius-md: 0.75rem;
+            --radius-lg: 1rem;
+            --radius-xl: 1.5rem;
+            --radius-2xl: 2rem;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        body {
+            font-family: var(--font-primary);
+            line-height: 1.6;
+            color: var(--algo-dark);
+            background: linear-gradient(135deg, var(--algo-light-gray) 0%, var(--algo-light-blue) 100%);
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+            padding: var(--space-md) 0;
+            transition: all 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-lg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            font-weight: var(--font-weight-black);
+            font-size: 1.5rem;
+            color: var(--algo-primary);
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--algo-primary) 0%, var(--algo-accent) 100%);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: var(--space-xl);
+            list-style: none;
+        }
+
+        .nav-link {
+            color: var(--algo-gray);
+            text-decoration: none;
+            font-weight: var(--font-weight-medium);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: var(--algo-primary);
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--algo-accent);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .connect-btn {
+            background: linear-gradient(135deg, var(--algo-primary) 0%, var(--algo-accent) 100%);
+            color: white;
+            padding: var(--space-sm) var(--space-lg);
+            border: none;
+            border-radius: var(--radius-lg);
+            font-weight: var(--font-weight-semibold);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .connect-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: var(--space-3xl) 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0, 102, 204, 0.1) 0%, transparent 50%),
+                linear-gradient(135deg, var(--algo-light-gray) 0%, var(--algo-light-blue) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: 
+                repeating-linear-gradient(
+                    45deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(0, 212, 255, 0.03) 2px,
+                    rgba(0, 212, 255, 0.03) 4px
+                );
+            animation: float 20s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes float {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .hero-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-lg);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-3xl);
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-content {
+            animation: slideInLeft 1s ease-out;
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--algo-blue);
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--radius-xl);
+            font-size: 0.875rem;
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--space-lg);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: var(--font-weight-black);
+            line-height: 1.1;
+            margin-bottom: var(--space-lg);
+            background: linear-gradient(135deg, var(--algo-primary) 0%, var(--algo-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--algo-gray);
+            margin-bottom: var(--space-xl);
+            line-height: 1.7;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: var(--space-md);
+            margin-bottom: var(--space-xl);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--algo-primary) 0%, var(--algo-accent) 100%);
+            color: white;
+            padding: var(--space-md) var(--space-xl);
+            border: none;
+            border-radius: var(--radius-lg);
+            font-weight: var(--font-weight-semibold);
+            font-size: 1.125rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--algo-primary);
+            padding: var(--space-md) var(--space-xl);
+            border: 2px solid var(--algo-primary);
+            border-radius: var(--radius-lg);
+            font-weight: var(--font-weight-semibold);
+            font-size: 1.125rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .btn-secondary:hover {
+            background: var(--algo-primary);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: var(--space-xl);
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: var(--font-weight-bold);
+            color: var(--algo-primary);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--algo-gray);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .hero-visual {
+            position: relative;
+            animation: slideInRight 1s ease-out;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .dashboard-mockup {
+            background: white;
+            border-radius: var(--radius-2xl);
+            padding: var(--space-xl);
+            box-shadow: var(--shadow-2xl);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dashboard-mockup::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--algo-primary) 0%, var(--algo-accent) 100%);
+        }
+
+        .mockup-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+            padding-bottom: var(--space-md);
+            border-bottom: 1px solid var(--algo-light-gray);
+        }
+
+        .mockup-title {
+            font-weight: var(--font-weight-bold);
+            color: var(--algo-primary);
+        }
+
+        .mockup-badge {
+            background: var(--algo-light-blue);
+            color: var(--algo-blue);
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            font-weight: var(--font-weight-semibold);
+        }
+
+        .mockup-content {
+            display: grid;
+            gap: var(--space-md);
+        }
+
+        .mockup-card {
+            background: var(--algo-light-gray);
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .mockup-info h4 {
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--space-xs);
+        }
+
+        .mockup-info p {
+            color: var(--algo-gray);
+            font-size: 0.875rem;
+        }
+
+        .mockup-value {
+            font-weight: var(--font-weight-bold);
+            color: var(--algo-blue);
+        }
+
+        /* Features Section */
+        .features {
+            padding: var(--space-3xl) 0;
+            background: white;
+        }
+
+        .features-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-lg);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: var(--space-3xl);
+        }
+
+        .section-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--algo-blue);
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--radius-xl);
+            font-size: 0.875rem;
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--space-md);
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: var(--font-weight-black);
+            margin-bottom: var(--space-md);
+            color: var(--algo-primary);
+        }
+
+        .section-subtitle {
+            font-size: 1.125rem;
+            color: var(--algo-gray);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: var(--space-xl);
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--algo-light-gray);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--algo-primary) 0%, var(--algo-accent) 100%);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--algo-primary) 0%, var(--algo-accent) 100%);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: var(--space-lg);
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--space-sm);
+            color: var(--algo-primary);
+        }
+
+        .feature-description {
+            color: var(--algo-gray);
+            line-height: 1.7;
+            margin-bottom: var(--space-md);
+        }
+
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .feature-list li {
+            padding: var(--space-xs) 0;
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            color: var(--algo-gray);
+            font-size: 0.875rem;
+        }
+
+        .feature-list li::before {
+            content: '✓';
+            color: var(--success);
+            font-weight: var(--font-weight-bold);
+        }
+
+        /* Stats Section */
+        .stats {
+            background: linear-gradient(135deg, var(--algo-primary) 0%, var(--algo-blue) 100%);
+            color: white;
+            padding: var(--space-3xl) 0;
+        }
+
+        .stats-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-lg);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-xl);
+            text-align: center;
+        }
+
+        .stats-item {
+            padding: var(--space-lg);
+        }
+
+        .stats-number {
+            font-size: 3rem;
+            font-weight: var(--font-weight-black);
+            margin-bottom: var(--space-sm);
+            color: var(--algo-accent);
+        }
+
+        .stats-label {
+            font-size: 1.125rem;
+            opacity: 0.9;
+        }
+
+        /* CTA Section */
+        .cta {
+            background: var(--algo-light-blue);
+            padding: var(--space-3xl) 0;
+        }
+
+        .cta-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 var(--space-lg);
+            text-align: center;
+        }
+
+        .cta-title {
+            font-size: 2.5rem;
+            font-weight: var(--font-weight-black);
+            margin-bottom: var(--space-md);
+            color: var(--algo-primary);
+        }
+
+        .cta-subtitle {
+            font-size: 1.25rem;
+            color: var(--algo-gray);
+            margin-bottom: var(--space-xl);
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: var(--space-md);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--algo-primary);
+            color: white;
+            padding: var(--space-3xl) 0 var(--space-xl);
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-lg);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-xl);
+            margin-bottom: var(--space-xl);
+        }
+
+        .footer-section h3 {
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--space-md);
+            color: var(--algo-accent);
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-links li {
+            margin-bottom: var(--space-sm);
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--algo-accent);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: var(--space-lg);
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero-container {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .hero-stats {
+                justify-content: center;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        /* Animations */
+        .fade-in {
+            opacity: 0;
+            animation: fadeIn 1s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        .slide-up {
+            transform: translateY(50px);
+            opacity: 0;
+            animation: slideUp 1s ease-out forwards;
+        }
+
+        @keyframes slideUp {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Utility Classes */
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, var(--algo-primary) 0%, var(--algo-accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo">
+                <div class="logo-icon">🚀</div>
+                <span>StartEx</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="#features" class="nav-link">Features</a></li>
+                <li><a href="#ecosystem" class="nav-link">Ecosystem</a></li>
+                <li><a href="#competitions" class="nav-link">Competitions</a></li>
+                <li><a href="#docs" class="nav-link">Docs</a></li>
+            </ul>
+            <a href="#" class="connect-btn">Connect Wallet</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-container">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <span>⚡</span>
+                    <span>Powered by Algorand & AlgoKit</span>
+                </div>
+                <h1 class="hero-title">
+                    Tokenize Your Startup.<br>
+                    <span class="gradient-text">Build Your Future.</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Revolutionary platform bridging traditional startup funding and DeFi. 
+                    Convert your startup into tradeable Algorand Standard Assets (ASA) and compete 
+                    for funding in community-driven competitions.
+                </p>
+                <div class="hero-buttons">
+                    <a href="#" class="btn-primary">
+                        <span>🚀</span>
+                        Launch Your Startup
+                    </a>
+                    <a href="#" class="btn-secondary">
+                        <span>📖</span>
+                        Learn More
+                    </a>
+                </div>
+                <div class="hero-stats">
+                    <div class="stat">
+                        <span class="stat-number">150+</span>
+                        <span class="stat-label">Active Startups</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">$2.5M+</span>
+                        <span class="stat-label">Total Funded</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number">10K+</span>
+                        <span class="stat-label">Community Members</span>
+                    </div>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="dashboard-mockup">
+                    <div class="mockup-header">
+                        <h3 class="mockup-title">TechFlow AI</h3>
+                        <span class="mockup-badge">Verified</span>
+                    </div>
+                    <div class="mockup-content">
+                        <div class="mockup-card">
+                            <div class="mockup-info">
+                                <h4>Token Price</h4>
+                                <p>TECH ASA</p>
+                            </div>
+                            <div class="mockup-value">$0.045</div>
+                        </div>
+                        <div class="mockup-card">
+                            <div class="mockup-info">
+                                <h4>Market Cap</h4>
+                                <p>Total Supply: 1M</p>
+                            </div>
+                            <div class="mockup-value">$45K</div>
+                        </div>
+                        <div class="mockup-card">
+                            <div class="mockup-info">
+                                <h4>GitHub Score</h4>
+                                <p>⭐ 189 stars</p>
+                            </div>
+                            <div class="mockup-value">4,850</div>
+                        </div>
+                        <div class="mockup-card">
+                            <div class="mockup-info">
+                                <h4>Competition Rank</h4>
+                                <p>January Challenge</p>
+                            </div>
+                            <div class="mockup-value">#3</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="features-container">
+            <div class="section-header">
+                <div class="section-badge">
+                    <span>🎯</span>
+                    <span>Key Features</span>
+                </div>
+                <h2 class="section-title">Why Choose StartEx?</h2>
+                <p class="section-subtitle">
+                    Everything you need to tokenize, compete, and grow your startup on Algorand
+                </p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">🪙</div>
+                    <h3 class="feature-title">ASA Tokenization</h3>
+                    <p class="feature-description">
+                        Convert your startup into tradeable Algorand Standard Assets with just a few clicks.
+                    </p>
+                    <ul class="feature-list">
+                        <li>One-click ASA creation</li>
+                        <li>Smart contract automation</li>
+                        <li>Low fees & instant finality</li>
+                        <li>Full ecosystem compatibility</li>
+                    </ul>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">🏆</div>
+                    <h3 class="feature-title">Competition Platform</h3>
+                    <p class="feature-description">
+                        Compete with other startups in community-driven competitions with real prize pools.
+                    </p>
+                    <ul class="feature-list">
+                        <li>Monthly competitions</li>
+                        <li>Real ALGO prizes</li>
+                        <li>Fair scoring system</li>
+                        <li>Community voting</li>
+                    </ul>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">📊</div>
+                    <h3 class="feature-title">Real-Time Metrics</h3>
+                    <p class="feature-description">
+                        Automated tracking of GitHub activity, social media growth, and platform engagement.
+                    </p>
+                    <ul class="feature-list">
+                        <li>GitHub integration</li>
+                        <li>Social media tracking</li>
+                        <li>Performance analytics</li>
+                        <li>Transparent scoring</li>
+                    </ul>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">💎</div>
+                    <h3 class="feature-title">Direct Investment</h3>
+                    <p class="feature-description">
+                        Support startups directly by purchasing their ASA tokens and track your portfolio performance.
+                    </p>
+                    <ul class="feature-list">
+                        <li>Direct ASA purchases</li>
+                        <li>Portfolio tracking</li>
+                        <li>Secondary trading</li>
+                        <li>Yield opportunities</li>
+                    </ul>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">🌍</div>
+                    <h3 class="feature-title">Global Ecosystem</h3>
+                    <p class="feature-description">
+                        Access a worldwide network of startups, investors, and supporters on Algorand.
+                    </p>
+                    <ul class="feature-list">
+                        <li>Global accessibility</li>
+                        <li>Cross-border payments</li>
+                        <li>24/7 trading</li>
+                        <li>Multi-language support</li>
+                    </ul>
+                </div>
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">🔒</div>
+                    <h3 class="feature-title">Secure & Fast</h3>
+                    <p class="feature-description">
+                        Built on Algorand's Pure Proof-of-Stake with industry-leading security and speed.
+                    </p>
+                    <ul class="feature-list">
+                        <li>4.5 second finality</li>
+                        <li>Carbon negative</li>
+                        <li>Military-grade security</li>
+                        <li>99.99% uptime</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Platform Stats -->
+    <section class="stats">
+        <div class="stats-container">
+            <div class="stats-item">
+                <div class="stats-number">150+</div>
+                <div class="stats-label">Active Startups</div>
+            </div>
+            <div class="stats-item">
+                <div class="stats-number">$2.5M</div>
+                <div class="stats-label">Total Funding</div>
+            </div>
+            <div class="stats-item">
+                <div class="stats-number">25</div>
+                <div class="stats-label">Live Competitions</div>
+            </div>
+            <div class="stats-item">
+                <div class="stats-number">10K+</div>
+                <div class="stats-label">Community Members</div>
+            </div>
+            <div class="stats-item">
+                <div class="stats-number">99.9%</div>
+                <div class="stats-label">Uptime</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Ecosystem Section -->
+    <section class="features" id="ecosystem">
+        <div class="features-container">
+            <div class="section-header">
+                <div class="section-badge">
+                    <span>🌟</span>
+                    <span>For Everyone</span>
+                </div>
+                <h2 class="section-title">Built for the Entire Ecosystem</h2>
+                <p class="section-subtitle">
+                    Whether you're a startup founder, investor, or community member, StartEx has something for you
+                </p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card slide-up">
+                    <div class="feature-icon">🚀</div>
+                    <h3 class="feature-title">For Startups</h3>
+                    <p class="feature-description">
+                        Everything you need to tokenize, compete, and grow your startup on Algorand.
+                    </p>
+                    <ul class="feature-list">
+                        <li>GitHub repo integration</li>
+                        <li>Automated ASA creation</li>
+                        <li>Competition participation</li>
+                        <li>Community building tools</li>
+                        <li>Token management dashboard</li>
+                        <li>Real-time analytics</li>
+                    </ul>
+                </div>
+                <div class="feature-card slide-up">
+                    <div class="feature-icon">💰</div>
+                    <h3 class="feature-title">For Investors</h3>
+                    <p class="feature-description">
+                        Discover and invest in promising startups with transparent metrics and easy trading.
+                    </p>
+                    <ul class="feature-list">
+                        <li>Curated startup discovery</li>
+                        <li>Direct ASA investment</li>
+                        <li>Portfolio analytics</li>
+                        <li>Secondary market trading</li>
+                        <li>Community governance</li>
+                        <li>Risk assessment tools</li>
+                    </ul>
+                </div>
+                <div class="feature-card slide-up">
+                    <div class="feature-icon">🤝</div>
+                    <h3 class="feature-title">For Community</h3>
+                    <p class="feature-description">
+                        Participate in governance, competitions, and help shape the future of startup funding.
+                    </p>
+                    <ul class="feature-list">
+                        <li>Competition voting</li>
+                        <li>Governance participation</li>
+                        <li>Early access opportunities</li>
+                        <li>Community rewards</li>
+                        <li>Educational resources</li>
+                        <li>Networking events</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="features" style="background: var(--algo-light-blue);">
+        <div class="features-container">
+            <div class="section-header">
+                <div class="section-badge">
+                    <span>⚡</span>
+                    <span>Simple Process</span>
+                </div>
+                <h2 class="section-title">How StartEx Works</h2>
+                <p class="section-subtitle">
+                    Get started in just a few steps and join the revolution in startup funding
+                </p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon" style="background: linear-gradient(135deg, #10B981 0%, #059669 100%);">1</div>
+                    <h3 class="feature-title">Connect & Register</h3>
+                    <p class="feature-description">
+                        Connect your Algorand wallet and register your startup with GitHub integration.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);">2</div>
+                    <h3 class="feature-title">Create ASA Token</h3>
+                    <p class="feature-description">
+                        Automatically generate your startup's ASA token with customizable parameters.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" style="background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);">3</div>
+                    <h3 class="feature-title">Join Competitions</h3>
+                    <p class="feature-description">
+                        Participate in monthly competitions and win ALGO prizes based on real metrics.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" style="background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);">4</div>
+                    <h3 class="feature-title">Grow & Trade</h3>
+                    <p class="feature-description">
+                        Build your community, track metrics, and enable trading of your ASA tokens.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="features">
+        <div class="features-container">
+            <div class="section-header">
+                <div class="section-badge">
+                    <span>💬</span>
+                    <span>Success Stories</span>
+                </div>
+                <h2 class="section-title">What Our Community Says</h2>
+                <p class="section-subtitle">
+                    Real feedback from startups and investors using StartEx
+                </p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon" style="background: linear-gradient(135deg, #06B6D4 0%, #0891B2 100%); font-size: 1rem;">
+                        "
+                    </div>
+                    <p class="feature-description" style="font-style: italic; margin-bottom: var(--space-md);">
+                        "StartEx revolutionized how we approach funding. The ASA tokenization was seamless, 
+                        and we raised $50K in our first month through competitions."
+                    </p>
+                    <h4 style="font-weight: var(--font-weight-semibold); color: var(--algo-primary);">
+                        Alex Chen, TechFlow AI
+                    </h4>
+                    <p style="color: var(--algo-gray); font-size: 0.875rem;">
+                        AI Development Platform • $45K Raised
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" style="background: linear-gradient(135deg, #06B6D4 0%, #0891B2 100%); font-size: 1rem;">
+                        "
+                    </div>
+                    <p class="feature-description" style="font-style: italic; margin-bottom: var(--space-md);">
+                        "As an investor, I love the transparency and real-time metrics. 
+                        The portfolio tracking is fantastic, and the community is very engaged."
+                    </p>
+                    <h4 style="font-weight: var(--font-weight-semibold); color: var(--algo-primary);">
+                        Sarah Martinez, Crypto Investor
+                    </h4>
+                    <p style="color: var(--algo-gray); font-size: 0.875rem;">
+                        Early Investor • $25K Portfolio
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon" style="background: linear-gradient(135deg, #06B6D4 0%, #0891B2 100%); font-size: 1rem;">
+                        "
+                    </div>
+                    <p class="feature-description" style="font-style: italic; margin-bottom: var(--space-md);">
+                        "The Algorand integration is flawless. Fast transactions, low fees, 
+                        and the environmental benefits align perfectly with our values."
+                    </p>
+                    <h4 style="font-weight: var(--font-weight-semibold); color: var(--algo-primary);">
+                        Dr. Michael Kim, GreenChain
+                    </h4>
+                    <p style="color: var(--algo-gray); font-size: 0.875rem;">
+                        Sustainability Startup • Top 3 Ranking
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta" id="get-started">
+        <div class="cta-container">
+            <h2 class="cta-title">Ready to Launch Your Startup?</h2>
+            <p class="cta-subtitle">
+                Join over 150 startups already using StartEx to tokenize, compete, and grow on Algorand
+            </p>
+            <div class="cta-buttons">
+                <a href="#" class="btn-primary">
+                    <span>🚀</span>
+                    Get Started Now
+                </a>
+                <a href="#" class="btn-secondary">
+                    <span>📚</span>
+                    View Documentation
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-grid">
+                <div class="footer-section">
+                    <h3>StartEx</h3>
+                    <p style="color: rgba(255, 255, 255, 0.8); margin-bottom: var(--space-md);">
+                        Revolutionary platform bridging traditional startup funding and DeFi on Algorand.
+                    </p>
+                    <div style="display: flex; gap: var(--space-md);">
+                        <a href="#" style="color: var(--algo-accent); text-decoration: none;">Twitter</a>
+                        <a href="#" style="color: var(--algo-accent); text-decoration: none;">Discord</a>
+                        <a href="#" style="color: var(--algo-accent); text-decoration: none;">GitHub</a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h3>Platform</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Dashboard</a></li>
+                        <li><a href="#">Competitions</a></li>
+                        <li><a href="#">Leaderboard</a></li>
+                        <li><a href="#">Trading</a></li>
+                        <li><a href="#">Analytics</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Resources</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Documentation</a></li>
+                        <li><a href="#">API Reference</a></li>
+                        <li><a href="#">Tutorials</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Help Center</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Company</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Press Kit</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 StartEx. Built with ❤️ on Algorand. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', function() {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationDelay = Math.random() * 0.3 + 's';
+                    entry.target.classList.add('fade-in');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all feature cards
+        document.querySelectorAll('.feature-card').forEach(card => {
+            observer.observe(card);
+        });
+
+        // Stats counter animation
+        function animateStats() {
+            const stats = document.querySelectorAll('.stats-number');
+            stats.forEach(stat => {
+                const target = stat.textContent;
+                const isPercentage = target.includes('%');
+                const isCurrency = target.includes('
+                    );
+                const isPlusSign = target.includes('+');
+                
+                let numericValue = parseFloat(target.replace(/[$%+K]/g, ''));
+                if (target.includes('K')) numericValue *= 1000;
+                if (target.includes('M')) numericValue *= 1000000;
+                
+                let current = 0;
+                const increment = numericValue / 50;
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= numericValue) {
+                        current = numericValue;
+                        clearInterval(timer);
+                    }
+                    
+                    let displayValue = Math.floor(current);
+                    if (target.includes('K')) displayValue = (displayValue / 1000).toFixed(1) + 'K';
+                    if (target.includes('M')) displayValue = (displayValue / 1000000).toFixed(1) + 'M';
+                    if (isCurrency) displayValue = '
+                     + displayValue;
+                    if (isPercentage) displayValue = displayValue + '%';
+                    if (isPlusSign && !displayValue.includes('+')) displayValue = displayValue + '+';
+                    
+                    stat.textContent = displayValue;
+                }, 50);
+            });
+        }
+
+        // Trigger stats animation when stats section is visible
+        const statsObserver = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateStats();
+                    statsObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        const statsSection = document.querySelector('.stats');
+        if (statsSection) {
+            statsObserver.observe(statsSection);
+        }
+
+        // Interactive dashboard mockup
+        const mockupCards = document.querySelectorAll('.mockup-card');
+        mockupCards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.02)';
+                this.style.boxShadow = '0 8px 25px rgba(0, 212, 255, 0.15)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1)';
+                this.style.boxShadow = 'none';
+            });
+        });
+
+        // Add pulse animation to call-to-action buttons
+        setInterval(() => {
+            const ctaButtons = document.querySelectorAll('.btn-primary');
+            ctaButtons.forEach(btn => {
+                btn.classList.add('pulse');
+                setTimeout(() => btn.classList.remove('pulse'), 2000);
+            });
+        }, 5000);
+
+        // Dynamic background animation
+        function createFloatingElements() {
+            const container = document.querySelector('.hero');
+            
+            for (let i = 0; i < 15; i++) {
+                const element = document.createElement('div');
+                element.style.position = 'absolute';
+                element.style.width = Math.random() * 20 + 10 + 'px';
+                element.style.height = element.style.width;
+                element.style.background = 'rgba(0, 212, 255, 0.1)';
+                element.style.borderRadius = '50%';
+                element.style.left = Math.random() * 100 + '%';
+                element.style.top = Math.random() * 100 + '%';
+                element.style.animation = `float ${Math.random() * 20 + 10}s linear infinite`;
+                element.style.pointerEvents = 'none';
+                container.appendChild(element);
+            }
+        }
+
+        // Initialize floating elements
+        createFloatingElements();
+
+        // Wallet connection simulation
+        document.querySelector('.connect-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+            this.textContent = 'Connecting...';
+            this.style.opacity = '0.7';
+            
+            setTimeout(() => {
+                this.textContent = 'Connected ✓';
+                this.style.background = 'linear-gradient(135deg, #10B981 0%, #059669 100%)';
+                this.style.opacity = '1';
+            }, 2000);
+        });
+    </script>
+</body>
 </html>

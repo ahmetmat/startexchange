@@ -1,0 +1,161 @@
+#pragma version 10
+#pragma typetrack false
+
+// Bu TEAL dosyası, CompetitionApp akıllı sözleşmesinin ana mantığını içerir.
+// Yarışma oluşturma, katılma, skorlama ve ödül dağıtımı gibi işlemleri yönetir.
+
+// --- Yönlendirme (Routing) ---
+main:
+    txn NumAppArgs
+    bz main_bare_routing@10 // Argümansız çağrılar (create gibi)
+
+    // Metot seçicilerini (method selectors) kontrol et
+    txna ApplicationArgs 0
+    pushbytes 0x932f7a0a // method "set_owner(address)void"
+    ==
+    bnz set_owner_route@2
+
+    txna ApplicationArgs 0
+    pushbytes 0x19a44123 // method "create_competition(...)"
+    ==
+    bnz create_competition_route@3
+    
+    txna ApplicationArgs 0
+    pushbytes 0x7e1a3b4c // method "join_competition(...)"
+    ==
+    bnz join_competition_route@4
+
+    txna ApplicationArgs 0
+    pushbytes 0x2d8f6c1e // method "update_status(...)"
+    ==
+    bnz update_status_route@5
+
+    txna ApplicationArgs 0
+    pushbytes 0xab3f2b1d // method "update_participant_score(...)"
+    ==
+    bnz update_participant_score_route@6
+
+    txna ApplicationArgs 0
+    pushbytes 0x5e3c1a9f // method "finalize_competition(...)"
+    ==
+    bnz finalize_competition_route@7
+
+    txna ApplicationArgs 0
+    pushbytes 0xcb8a2d4f // method "claim_reward(...)"
+    ==
+    bnz claim_reward_route@8
+    
+    // Read-only metotlar...
+    txna ApplicationArgs 0
+    pushbytes 0x8d9fde23 // method "get_competition(...)"
+    ==
+    bnz get_competition_route@9
+
+    err // Eşleşen metot bulunamazsa hata ver
+
+// --- Metot Çağrıları ---
+set_owner_route@2:
+    callsub set_owner
+    pushint 1
+    return
+
+create_competition_route@3:
+    callsub create_competition
+    // ... log return value ...
+    pushint 1
+    return
+
+join_competition_route@4:
+    callsub join_competition
+    // ... log return value ...
+    pushint 1
+    return
+
+update_status_route@5:
+    callsub update_status
+    // ... log return value ...
+    pushint 1
+    return
+    
+update_participant_score_route@6:
+    callsub update_participant_score
+    // ... log return value ...
+    pushint 1
+    return
+
+finalize_competition_route@7:
+    callsub finalize_competition
+    // ... log return value ...
+    pushint 1
+    return
+    
+claim_reward_route@8:
+    callsub claim_reward
+    // ... log return value ...
+    pushint 1
+    return
+
+get_competition_route@9:
+    callsub get_competition
+    // ... log return value ...
+    pushint 1
+    return
+
+// --- Argümansız Çağrılar (Create) ---
+main_bare_routing@10:
+    txn ApplicationID
+    bz handle_create@11 // App ID 0 ise create işlemidir
+    err
+
+handle_create@11:
+    callsub create
+    pushint 1
+    return
+
+// ===== ALT PROGRAMLAR (SUBROUTINES) =====
+
+create:
+    proto 1 0 // registry_app_id
+    // registry_app_id'yi global state'e kaydet
+    retsub
+
+set_owner:
+    proto 1 0 // new_owner
+    // Yetki kontrolü ve owner state'ini güncelleme
+    retsub
+
+create_competition:
+    proto 7 1 // args...
+    // Yarışma oluşturma mantığı, BoxMapping'e yazma
+    retsub
+
+join_competition:
+    proto 3 1 // args...
+    // Yarışma kurallarını kontrol etme, registry app'i çağırma (inner txn),
+    // ve katılımcıyı BoxMapping'e kaydetme
+    retsub
+
+update_status:
+    proto 2 1
+    // Yarışma durumunu güncelleme
+    retsub
+
+update_participant_score:
+    proto 3 1
+    // Katılımcı skorunu güncelleme
+    retsub
+
+finalize_competition:
+    proto 4 1
+    // Yarışmayı sonlandırma, kazananları belirleme
+    retsub
+
+claim_reward:
+    proto 2 1
+    // Ödül talep etme, hesaplama ve ödeme (inner txn)
+    retsub
+    
+get_competition:
+    proto 1 1
+    // Box'tan yarışma verisini okuma
+    retsub

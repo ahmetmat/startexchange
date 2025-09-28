@@ -1,0 +1,210 @@
+{
+  "name": "StartupRegistryApp",
+  "structs": {
+    "Startup": {
+      "name": "Startup",
+      "elements": [
+        [
+          "owner",
+          "address"
+        ],
+        [
+          "name",
+          "string"
+        ],
+        [
+          "description",
+          "string"
+        ],
+        [
+          "github_repo",
+          "string"
+        ],
+        [
+          "website",
+          "string"
+        ],
+        [
+          "twitter",
+          "string"
+        ],
+        [
+          "token_asset_id",
+          "uint64"
+        ],
+        [
+          "created_at",
+          "uint64"
+        ],
+        [
+          "is_verified",
+          "bool"
+        ],
+        [
+          "total_score",
+          "uint64"
+        ],
+        [
+          "launchpad_app_id",
+          "uint64"
+        ]
+      ]
+    }
+  },
+  "methods": [
+    {
+      "name": "set_contract_owner",
+      "args": [
+        {
+          "type": "address",
+          "name": "new_owner"
+        }
+      ],
+      "returns": {
+        "type": "bool"
+      }
+    },
+    {
+      "name": "register_startup",
+      "args": [
+        {
+          "type": "string",
+          "name": "name"
+        },
+        {
+          "type": "string",
+          "name": "description"
+        },
+        {
+          "type": "string",
+          "name": "github_repo"
+        },
+        {
+          "type": "string",
+          "name": "website"
+        },
+        {
+          "type": "string",
+          "name": "twitter"
+        },
+        {
+          "type": "uint64",
+          "name": "token_asset_id"
+        }
+      ],
+      "returns": {
+        "type": "uint64"
+      }
+    },
+    {
+      "name": "update_startup",
+      "args": [
+        {
+          "type": "uint64",
+          "name": "startup_id"
+        },
+        {
+          "type": "string",
+          "name": "name"
+        },
+        {
+          "type": "string",
+          "name": "description"
+        },
+        {
+          "type": "string",
+          "name": "website"
+        },
+        {
+          "type": "string",
+          "name": "twitter"
+        }
+      ],
+      "returns": {
+        "type": "bool"
+      }
+    },
+    {
+      "name": "verify_startup",
+      "args": [
+        {
+          "type": "uint64",
+          "name": "startup_id"
+        },
+        {
+          "type": "bool",
+          "name": "verified_status"
+        }
+      ],
+      "returns": {
+        "type": "bool"
+      }
+    },
+    {
+      "name": "update_score",
+      "args": [
+        {
+          "type": "uint64",
+          "name": "startup_id"
+        },
+        {
+          "type": "uint64",
+          "name": "new_score"
+        }
+      ],
+      "returns": {
+        "type": "bool"
+      }
+    },
+    {
+      "name": "create_launchpad",
+      "args": [
+        {
+          "type": "uint64",
+          "name": "startup_id"
+        },
+        {
+          "type": "pay",
+          "name": "payment_for_mbr"
+        }
+      ],
+      "returns": {
+        "type": "uint64"
+      }
+    },
+    {
+      "name": "get_startup",
+      "args": [
+        {
+          "type": "uint64",
+          "name": "startup_id"
+        }
+      ],
+      "returns": {
+        "type": "(address,string,string,string,string,string,uint64,uint64,bool,uint64,uint64)"
+      },
+      "readonly": true
+    },
+    {
+      "name": "get_next_startup_id",
+      "args": [],
+      "returns": {
+        "type": "uint64"
+      },
+      "readonly": true
+    }
+  ],
+  "state": {
+    "global": {
+      "num_uints": 1,
+      "num_byte_slices": 1
+    },
+    "local": {
+      "num_uints": 0,
+      "num_byte_slices": 0
+    }
+  },
+  "bare_actions": {
+    "create": "NEVER"
+  }
+}
