@@ -21,10 +21,10 @@ interface AlgorandContextType {
     githubRepo: string;
     website?: string;
     twitter?: string;
-  }) => Promise<number>;
-  
+  }) => Promise<{ startupId: number; txId: string }>;
+
   getStartup: (startupId: number) => Promise<StartupData | null>;
-  
+
   // Token methods
   tokenizeStartup: (params: {
     startupId: number;
@@ -32,7 +32,7 @@ interface AlgorandContextType {
     tokenSymbol: string;
     totalSupply: number;
     decimals: number;
-  }) => Promise<number>;
+  }) => Promise<{ assetId: number; txId: string }>;
   
   transferTokens: (params: {
     startupId: number;

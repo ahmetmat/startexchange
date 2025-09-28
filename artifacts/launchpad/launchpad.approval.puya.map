@@ -1,0 +1,68 @@
+{
+  "name": "LaunchpadApp",
+  "structs": {},
+  "methods": [
+    {
+      "name": "setup",
+      "args": [
+        {"type": "address", "name": "owner"},
+        {"type": "uint64", "name": "token_id"}
+      ],
+      "returns": {"type": "void"},
+      "actions": {"call": ["NoOp"]}
+    },
+    {
+      "name": "set_sale_parameters",
+      "args": [
+        {"type": "uint64", "name": "price"},
+        {"type": "uint64", "name": "start_time"},
+        {"type": "uint64", "name": "end_time"}
+      ],
+      "returns": {"type": "bool"},
+      "actions": {"call": ["NoOp"]}
+    },
+    {
+      "name": "activate_sale",
+      "args": [],
+      "returns": {"type": "bool"},
+      "actions": {"call": ["NoOp"]}
+    },
+    {
+      "name": "opt_in_to_asset",
+      "args": [],
+      "returns": {"type": "bool"},
+      "actions": {"call": ["NoOp"]}
+    },
+    {
+      "name": "fund",
+      "args": [{"type": "axfer", "name": "axfer"}],
+      "returns": {"type": "bool"},
+      "actions": {"call": ["NoOp"]}
+    },
+    {
+      "name": "buy_tokens",
+      "args": [{"type": "pay", "name": "payment"}],
+      "returns": {"type": "uint64"},
+      "actions": {"call": ["NoOp"]}
+    },
+    {
+      "name": "claim_funds",
+      "args": [],
+      "returns": {"type": "bool"},
+      "actions": {"call": ["NoOp"]}
+    }
+  ],
+  "state": {
+    "schema": {
+      "global": {"num_uints": 6, "num_byte_slices": 1},
+      "local": {"num_uints": 0, "num_byte_slices": 0}
+    },
+    "keys": {},
+    "maps": {}
+  },
+  "bareActions": {
+    "create": ["NoOp"]
+  },
+  "arcs": []
+}
+

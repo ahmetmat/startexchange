@@ -237,13 +237,14 @@ export class AlgorandService {
     githubRepo: string;
     website?: string;
     twitter?: string;
-  }): Promise<number> {
+  }): Promise<{ startupId: number; txId: string }> {
     if (!this.currentAddress) {
       throw new Error('Wallet not connected');
     }
-    
+
+    const expectedStartupId = await this.getNextStartupId();
     const suggestedParams = await this.algodClient.getTransactionParams().do();
-    
+
     // Create application call transaction
     const appArgs = [
       new Uint8Array(Buffer.from('register_startup')),
@@ -264,16 +265,21 @@ export class AlgorandService {
     // Sign and send transaction
     const signedTxn = await this.signTransaction(txn);
     const { txId } = await this.algodClient.sendRawTransaction(signedTxn).do();
-    
+
     // Wait for confirmation
     const result = await algosdk.waitForConfirmation(this.algodClient, txId, 4);
-    
+
     // Extract startup ID from logs
-    const startupId = this.extractStartupIdFromLogs(result);
-    
-    return startupId;
+    const startupId =
+      this.extractStartupIdFromLogs(result) ?? expectedStartupId ?? this.extractStartupIdFromGlobalState(result) ?? expectedStartupId;
+
+    if (!startupId) {
+      throw new Error('Unable to determine startup id from transaction result');
+    }
+
+    return { startupId, txId };
   }
-  
+
   async getStartup(startupId: number): Promise<StartupData | null> {
     try {
       const appInfo = await this.algodClient.getApplicationByID(this.registryAppId).do();
@@ -303,11 +309,11 @@ export class AlgorandService {
     tokenSymbol: string;
     totalSupply: number;
     decimals: number;
-  }): Promise<number> {
+  }): Promise<{ assetId: number; txId: string }> {
     if (!this.currentAddress) {
       throw new Error('Wallet not connected');
     }
-    
+
     const suggestedParams = await this.algodClient.getTransactionParams().do();
     
     // Create payment transaction for tokenization fee (1 ALGO)
@@ -350,7 +356,11 @@ export class AlgorandService {
     // Extract asset ID from result
     const assetId = this.extractAssetIdFromResult(result);
     
-    return assetId;
+    if (!assetId) {
+      throw new Error('Unable to determine asset id from tokenization transaction');
+    }
+
+    return { assetId, txId };
   }
   
   async transferTokens(params: {
@@ -535,14 +545,70 @@ export class AlgorandService {
   }
   
   private async getTokenFactoryAddress(): Promise<string> {
-    const appInfo = await this.algodClient.getApplicationByID(this.tokenFactoryAppId).do();
+    await this.algodClient.getApplicationByID(this.tokenFactoryAppId).do();
     return algosdk.getApplicationAddress(this.tokenFactoryAppId);
   }
-  
-  private extractStartupIdFromLogs(result: any): number {
-    // Parse logs to extract startup ID
-    // Implementation depends on how we log in the contract
-    return 1; // Placeholder
+
+  private async getNextStartupId(): Promise<number> {
+    const state = await this.algodClient.getApplicationByID(this.registryAppId).do();
+    const values = state?.params?.['global-state'] ?? [];
+    for (const entry of values) {
+      const key = Buffer.from(entry.key, 'base64').toString('utf8');
+      if (key === 'next_id') {
+        return Number(entry.value?.uint ?? 0);
+      }
+    }
+    return 0;
+  }
+
+  private extractStartupIdFromLogs(result: any): number | null {
+    const logs = result?.logs;
+    if (!Array.isArray(logs)) return null;
+
+    for (const log of logs) {
+      try {
+        const buffer = Buffer.from(log, 'base64');
+        if (buffer.length === 8) {
+          let value = 0n;
+          for (const byte of buffer) {
+            value = (value << 8n) + BigInt(byte);
+          }
+          if (value > 0n) {
+            return Number(value);
+          }
+        }
+
+        const text = buffer.toString('utf8').trim();
+        const match = text.match(/(\d+)/);
+        if (match) {
+          const numeric = Number(match[1]);
+          if (!Number.isNaN(numeric) && numeric > 0) {
+            return numeric;
+          }
+        }
+      } catch (error) {
+        console.warn('Failed to parse startup id from log', error);
+      }
+    }
+
+    return null;
+  }
+
+  private extractStartupIdFromGlobalState(result: any): number | null {
+    const globalStateDelta = result?.['global-state-delta'];
+    if (!Array.isArray(globalStateDelta)) return null;
+
+    for (const delta of globalStateDelta) {
+      const key = Buffer.from(delta.key, 'base64').toString('utf8');
+      if (key === 'next_id' && delta.value?.action === 2) {
+        const newValue = Number(delta.value.uint ?? 0);
+        if (newValue > 0) {
+          return newValue - 1; // delta stores post-increment value
+        }
+      }
+    }
+
+    return null;
   }
   
   private extractAssetIdFromResult(result: any): number {

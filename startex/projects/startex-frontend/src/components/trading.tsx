@@ -16,6 +16,12 @@
 
     import { HeaderWalletControls } from '@/components/HeaderWalletControls'
     import { MainHeader } from '@/components/MainHeader'
+    import {
+    LAUNCHED_STARTUP_STORAGE_KEY,
+    LAUNCHED_STARTUP_UPDATE_EVENT,
+    loadLaunchedStartups,
+    type LaunchedStartupRecord,
+    } from '@/lib/startupStorage'
 
     import type { LeaderboardEntry, OrderBookSnapshot } from '@/lib/firebase/types'
     import { convertTimestamps, getLeaderboard } from '@/lib/firebase/firestore'
@@ -35,6 +41,7 @@
     trend: 'up' | 'down'
     logo: string
     startupId?: string
+    assetId?: number
     }
 
     type PortfolioItem = {
@@ -154,6 +161,23 @@
     }
     }
 
+    const toLaunchTokenCard = (record: LaunchedStartupRecord): TokenCard => {
+    const estimatedMarketCap = record.totalSupply * record.launchPrice
+    return {
+        symbol: record.tokenSymbol,
+        name: record.tokenName || record.name,
+        price: record.launchPrice,
+        change: '+0.0%',
+        volume: '--',
+        marketCap: estimatedMarketCap > 0 ? `${Math.round(estimatedMarketCap).toLocaleString()} ALGO` : '--',
+        holders: 0,
+        trend: 'up',
+        logo: record.tokenSymbol.slice(0, 2) || '🚀',
+        startupId: record.startupId.toString(),
+        assetId: record.assetId,
+    }
+    }
+
     export default function Trading() {
     const [userData, setUserData] = useState<UserData | null>(null)
     const [tokens, setTokens] = useState<TokenCard[]>(FALLBACK_TOKENS)
@@ -183,10 +207,33 @@
         try {
             const entries = await getLeaderboard('overall')
             const normalized = entries.map((entry) => convertTimestamps(entry))
-            if (!isMounted || !normalized.length) return
-            const mapped = normalized.map((entry) => toTokenCard(entry))
-            setTokens(mapped)
-            setSelectedToken((current) => current ?? mapped[0] ?? null)
+            if (!isMounted) return
+
+            const mapped = normalized.length ? normalized.map((entry) => toTokenCard(entry)) : []
+            const launched = loadLaunchedStartups()
+            const launchCards = launched.map((entry) => toLaunchTokenCard(entry))
+            const launchAssetIds = new Set(
+            launchCards
+                .map((card) => card.assetId)
+                .filter((id): id is number => typeof id === 'number' && Number.isFinite(id))
+            )
+
+            const combinedTokens = [
+            ...launchCards,
+            ...mapped.filter((token) =>
+                token.assetId ? !launchAssetIds.has(token.assetId) : true
+            ),
+            ]
+
+            const fallback = combinedTokens.length ? combinedTokens : mapped.length ? mapped : FALLBACK_TOKENS
+
+            setTokens(fallback)
+            setSelectedToken((current) => {
+            if (current) return current
+            if (launchCards[0]) return launchCards[0]
+            if (mapped[0]) return mapped[0]
+            return fallback[0] ?? null
+            })
         } catch (error) {
             console.error('Failed to load tokens from Firebase', error)
         } finally {
@@ -230,6 +277,49 @@
         }
     }, [selectedToken])
 
+    useEffect(() => {
+        const syncFromStorage = () => {
+        const launched = loadLaunchedStartups()
+        if (!launched.length) return
+        const launchCards = launched.map((entry) => toLaunchTokenCard(entry))
+        const launchIds = new Set(
+            launchCards
+            .map((card) => card.assetId)
+            .filter((id): id is number => typeof id === 'number' && Number.isFinite(id))
+        )
+
+        setTokens((existing) => {
+            const filtered = existing.filter((token) => {
+            if (!token.assetId) return true
+            return !launchIds.has(token.assetId)
+            })
+            const updated = [...launchCards, ...filtered]
+            return updated.length ? updated : existing
+        })
+
+        setSelectedToken((current) => {
+            if (current && current.assetId && launchIds.has(current.assetId)) {
+            return current
+            }
+            return launchCards[0] ?? current
+        })
+        }
+
+        syncFromStorage()
+
+        const handleStorage = (event: StorageEvent) => {
+        if (event.key && event.key !== LAUNCHED_STARTUP_STORAGE_KEY) return
+        syncFromStorage()
+        }
+
+        window.addEventListener('storage', handleStorage)
+        window.addEventListener(LAUNCHED_STARTUP_UPDATE_EVENT, syncFromStorage)
+        return () => {
+        window.removeEventListener('storage', handleStorage)
+        window.removeEventListener(LAUNCHED_STARTUP_UPDATE_EVENT, syncFromStorage)
+        }
+    }, [])
+
     const filteredTokens = useMemo(
         () =>
         tokens.filter((token) =>
@@ -238,6 +328,21 @@
         ),
         [tokens, searchQuery]
     )
+
+    useEffect(() => {
+        if (typeof window === 'undefined') return
+        const params = new URLSearchParams(window.location.search)
+        const assetIdParam = params.get('assetId')
+        if (!assetIdParam) return
+        const assetId = Number(assetIdParam)
+        const matching = tokens.find((token) => {
+        if (!Number.isNaN(assetId) && assetId > 0 && token.assetId === assetId) return true
+        return token.symbol.toLowerCase() === assetIdParam.toLowerCase()
+        })
+        if (matching) {
+        setSelectedToken(matching)
+        }
+    }, [tokens])
 
     const portfolioValue = useMemo(
         () => portfolio.reduce((total, item) => total + item.value, 0),

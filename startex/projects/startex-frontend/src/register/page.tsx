@@ -113,28 +113,30 @@
         try {
         // 1) Register startup
         console.log('Step 1: Registering startup...')
-        const newStartupId = await registerStartup({
+        const { startupId: newStartupId, txId: registerTxId } = await registerStartup({
             name: formData.name.trim(),
             description: formData.description.trim(),
             githubRepo: formData.githubRepo.trim(),
             website: formData.website?.trim(),
             twitter: formData.twitter?.trim(),
         })
-        
+
         setStartupId(newStartupId)
+        setTxIds((prev) => ({ ...prev, register: registerTxId }))
         console.log('Startup registered with ID:', newStartupId)
-        
+
         // 2) Tokenize startup
         console.log('Step 2: Tokenizing startup...')
-        const newAssetId = await tokenizeStartup({
+        const { assetId: newAssetId, txId: tokenizeTxId } = await tokenizeStartup({
             startupId: newStartupId,
             tokenName: formData.tokenName.trim(),
             tokenSymbol: formData.tokenSymbol.trim(),
             totalSupply: parseInt(formData.initialSupply),
             decimals: parseInt(formData.decimals),
         })
-        
+
         setAssetId(newAssetId)
+        setTxIds((prev) => ({ ...prev, tokenize: tokenizeTxId }))
         console.log('Token created with Asset ID:', newAssetId)
         
         // 3) Initialize metrics (optional - can be done by oracle)

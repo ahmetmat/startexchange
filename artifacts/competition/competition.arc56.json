@@ -1,7 +1,7 @@
 {
   "version": 3,
   "sources": [
-    "../../competition_app.py"
+    "../../competition.py"
   ],
   "mappings": ";;;",
   "op_pc_offset": 0,
