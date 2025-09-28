@@ -25,7 +25,7 @@ A revolutionary platform bridging traditional startup funding and DeFi, built on
 
 ## 🏗️ Architecture
 
-### Smart Contracts (PyTeal)
+### Smart Contracts (Algokit)
 - **Startup Registry**: Core registration and profile management
 - **Competition System**: Tournament-style competitions with prize pools
 - **Tokenization Factory**: ASA creation and management
